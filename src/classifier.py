@@ -1,9 +1,7 @@
-import enum
 import torch
 from torch import nn
 import numpy as np
 from torch.utils.data import random_split, DataLoader
-import torchvision
 from torchvision import transforms, datasets
 
 # Decide whether or not to use GPU based on CUDA availability
@@ -73,6 +71,7 @@ class Classifier(nn.Module):
             nn.LazyLinear(out_features=1),
             nn.Sigmoid()
         )
+
     def forward(self, x):
         x = self.conv_stack(x)
         x = self.flatten(x)
@@ -92,6 +91,7 @@ def train():
         cumulative_loss = 0
         train_acc = 0
         test_acc = 0
+        
         for data in train_loader:
 
             # Unpack data into inputs and labels
