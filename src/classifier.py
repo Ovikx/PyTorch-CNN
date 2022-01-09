@@ -10,7 +10,7 @@ print(f'Using {device}')
 
 # Constants
 CHANNELS = 3
-EPOCHS = 100
+EPOCHS = 20
 
 # Define the image preprocessing pipeline
 transform = transforms.Compose([
@@ -86,6 +86,7 @@ optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
 
 # Training loop
 def train():
+    torch.backends.cudnn.benchmark = True
     for epoch in range(EPOCHS):
         # Metrics
         cumulative_loss = 0
@@ -97,8 +98,9 @@ def train():
             # Unpack data into inputs and labels
             images, labels = data[0].to(device), data[1].to(device)
 
-            # Initialize the gradients
-            optimizer.zero_grad()
+            # Zero the gradients
+            for param in model.parameters():
+                param.grad = None
 
             # Get the output from the model
             pred_labels = model(images)
@@ -125,7 +127,8 @@ def train():
         for data in test_loader:
             images, labels = data[0].to(device), data[1].to(device)
 
-            pred_labels = model(images)
+            with torch.no_grad():
+                pred_labels = model(images)
             labels = labels.unsqueeze(1).float()
 
             for i, v in enumerate(pred_labels):
